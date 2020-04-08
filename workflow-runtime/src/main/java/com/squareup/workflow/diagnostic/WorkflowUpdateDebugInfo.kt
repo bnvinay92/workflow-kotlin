@@ -150,7 +150,7 @@ private fun StringBuilder.writeUpdate(update: WorkflowUpdateDebugInfo) {
           append("workflow[key=")
           append(source.key)
           append("]: ")
-          appendln(source.output)
+          appendLine(source.output)
           append("↳ ")
           append(source.childInfo.toDescriptionString())
         }
@@ -159,7 +159,7 @@ private fun StringBuilder.writeUpdate(update: WorkflowUpdateDebugInfo) {
     is Passthrough -> {
       append("passing through from workflow[key=")
       append(kind.key)
-      appendln("]")
+      appendLine("]")
       append("↳ ")
       append(kind.childInfo.toDescriptionString())
     }

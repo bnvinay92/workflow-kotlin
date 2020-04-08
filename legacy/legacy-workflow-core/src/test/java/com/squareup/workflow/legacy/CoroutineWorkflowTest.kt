@@ -133,7 +133,7 @@ class CoroutineWorkflowTest : CoroutineScope {
     }
     testContext.triggerActions()
     assertFailsWith<ExpectedException> {
-      @Suppress("IMPLICIT_NOTHING_AS_TYPE_PARAMETER")
+      @Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
       workflow.getCompleted()
     }
   }
@@ -145,7 +145,7 @@ class CoroutineWorkflowTest : CoroutineScope {
     workflow.cancel()
     testContext.triggerActions()
     assertFailsWith<CancellationException> {
-      @Suppress("IMPLICIT_NOTHING_AS_TYPE_PARAMETER")
+      @Suppress("IMPLICIT_NOTHING_TYPE_ARGUMENT_IN_RETURN_POSITION")
       workflow.getCompleted()
     }
   }

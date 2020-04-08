@@ -86,46 +86,46 @@ data class WorkflowHierarchyDebugSnapshot(
 
 private fun StringBuilder.writeSnapshot(snapshot: WorkflowHierarchyDebugSnapshot) {
   append("workflowType: ")
-  appendln(snapshot.workflowType)
+  appendLine(snapshot.workflowType)
 
   append("props: ")
-  appendln(snapshot.props)
+  appendLine(snapshot.props)
 
   append("state: ")
-  appendln(snapshot.state)
+  appendLine(snapshot.state)
 
   append("rendering: ")
   append(snapshot.rendering)
 
   if (snapshot.children.isNotEmpty()) {
-    appendln()
+    appendLine()
     append("children (")
     append(snapshot.children.size)
-    appendln("):")
+    appendLine("):")
 
     for ((index, child) in snapshot.children.withIndex()) {
       append("| key: ")
-      appendln(child.key.ifEmpty { "{no key}" })
+      appendLine(child.key.ifEmpty { "{no key}" })
       append(
           child.snapshot.toDescriptionString()
               .prependIndent("|   ")
       )
-      if (index < snapshot.children.size - 1) appendln()
+      if (index < snapshot.children.size - 1) appendLine()
     }
   }
 
   if (snapshot.workers.isNotEmpty()) {
-    appendln()
+    appendLine()
     append("workers (")
     append(snapshot.workers.size)
-    appendln("):")
+    appendLine("):")
 
     for ((index, worker) in snapshot.workers.withIndex()) {
       append("| [")
       append(worker.key.ifEmpty { "{no key}" })
       append("] ")
       append(worker.description)
-      if (index < snapshot.workers.size - 1) appendln()
+      if (index < snapshot.workers.size - 1) appendLine()
     }
   }
 }

@@ -102,7 +102,7 @@ private fun BufferedSource.readHeader(): String? = buildString {
   while (true) {
     val line = readUtf8Line() ?: throw IllegalArgumentException("Expected --- but found EOF.")
     if (line == YAML_DELIMITER) return@buildString
-    appendln(line)
+    appendLine(line)
   }
 }
 
