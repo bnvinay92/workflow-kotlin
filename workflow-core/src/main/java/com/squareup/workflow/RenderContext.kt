@@ -116,6 +116,21 @@ interface RenderContext<StateT, in OutputT : Any> {
     key: String = "",
     handler: (T) -> WorkflowAction<StateT, OutputT>
   )
+
+  /**
+   * Ensures [sideEffect] is running with the given [key].
+   *
+   * @param key The string key that is used to distinguish between side effects.
+   * @param sideEffect A suspending lambda that will be started the first time this method called
+   * with the given key, and
+   * [cancelled](https://kotlinlang.org/docs/reference/coroutines/cancellation-and-timeouts.html)
+   * after it is no longer called with the given key (or this workflow is torn down, whichever
+   * happens first).
+   */
+  fun runningSideEffect(
+    key: String,
+    sideEffect: suspend () -> Unit
+  )
 }
 
 /**
