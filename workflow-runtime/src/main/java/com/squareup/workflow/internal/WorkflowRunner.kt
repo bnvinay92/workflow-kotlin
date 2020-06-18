@@ -15,10 +15,10 @@
  */
 package com.squareup.workflow.internal
 
+import com.squareup.workflow.ExperimentalWorkflow
 import com.squareup.workflow.RenderingAndSnapshot
 import com.squareup.workflow.Snapshot
 import com.squareup.workflow.StatefulWorkflow
-import com.squareup.workflow.ExperimentalWorkflow
 import com.squareup.workflow.Workflow
 import com.squareup.workflow.diagnostic.IdCounter
 import com.squareup.workflow.diagnostic.WorkflowDiagnosticListener
@@ -33,7 +33,7 @@ import kotlinx.coroutines.selects.select
 import kotlin.coroutines.EmptyCoroutineContext
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalWorkflow::class)
-internal class WorkflowRunner<PropsT, OutputT : Any, RenderingT>(
+internal class WorkflowRunner<PropsT, OutputT, RenderingT>(
   scope: CoroutineScope,
   protoWorkflow: Workflow<PropsT, OutputT, RenderingT>,
   props: StateFlow<PropsT>,
@@ -92,15 +92,16 @@ internal class WorkflowRunner<PropsT, OutputT : Any, RenderingT>(
 
   // Tick _might_ return an output, but if it returns null, it means the state or a child
   // probably changed, so we should re-render/snapshot and emit again.
-  suspend fun nextOutput(): OutputT? = select {
+  suspend fun nextOutput(): OutputT = select {
     // Stop trying to read from the inputs channel after it's closed.
     if (!propsChannel.isClosedForReceive) {
       // TODO(https://github.com/square/workflow/issues/512) Replace with receiveOrClosed.
       @Suppress("EXPERIMENTAL_API_USAGE", "DEPRECATION")
       propsChannel.onReceiveOrNull { newProps ->
         newProps?.let(::onNewProps)
-        // Return null to tell the caller to do another render pass, but not emit an output.
-        return@onReceiveOrNull null
+        // Tell the caller to do another render pass, but not emit an output.
+        @Suppress("UNCHECKED_CAST")
+        return@onReceiveOrNull NoOutput as OutputT
       }
     }
 
@@ -120,7 +121,7 @@ internal class WorkflowRunner<PropsT, OutputT : Any, RenderingT>(
   }
 
   // TODO(https://github.com/square/workflow/issues/1192) Migrate testing infra.
-  private fun <PropsT, OutputT : Any, RenderingT> doRender(
+  private fun <PropsT, OutputT, RenderingT> doRender(
     rootNode: WorkflowNode<PropsT, *, OutputT, RenderingT>,
     workflow: StatefulWorkflow<PropsT, *, OutputT, RenderingT>,
     props: PropsT

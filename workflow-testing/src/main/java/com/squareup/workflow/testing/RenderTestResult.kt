@@ -24,7 +24,7 @@ import com.squareup.workflow.WorkflowAction
  * @see verifyAction
  * @see verifyActionResult
  */
-interface RenderTestResult<StateT, OutputT : Any> {
+interface RenderTestResult<StateT, OutputT> {
 
   /**
    * Asserts that the render pass handled either a workflow/worker output or a rendering event, and

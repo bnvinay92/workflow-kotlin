@@ -57,7 +57,7 @@ class RealRenderContextTest {
     )
 
     @Suppress("UNCHECKED_CAST")
-    override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> render(
+    override fun <ChildPropsT, ChildOutputT, ChildRenderingT> render(
       child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
       props: ChildPropsT,
       key: String,
@@ -98,7 +98,7 @@ class RealRenderContextTest {
   }
 
   private class PoisonRenderer<S, O : Any> : Renderer<S, O> {
-    override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> render(
+    override fun <ChildPropsT, ChildOutputT, ChildRenderingT> render(
       child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
       props: ChildPropsT,
       key: String,

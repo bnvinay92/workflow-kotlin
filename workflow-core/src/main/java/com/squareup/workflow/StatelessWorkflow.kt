@@ -34,7 +34,7 @@ import com.squareup.workflow.WorkflowAction.Updater
  *
  * @see StatefulWorkflow
  */
-abstract class StatelessWorkflow<in PropsT, out OutputT : Any, out RenderingT> :
+abstract class StatelessWorkflow<in PropsT, out OutputT, out RenderingT> :
     Workflow<PropsT, OutputT, RenderingT> {
 
   @Suppress("UNCHECKED_CAST")
@@ -80,7 +80,7 @@ abstract class StatelessWorkflow<in PropsT, out OutputT : Any, out RenderingT> :
  * [props][PropsT] received from its parent, and it may render child workflows that do have
  * their own internal state.
  */
-inline fun <PropsT, OutputT : Any, RenderingT> Workflow.Companion.stateless(
+inline fun <PropsT, OutputT, RenderingT> Workflow.Companion.stateless(
   crossinline render: RenderContext<Nothing, OutputT>.(props: PropsT) -> RenderingT
 ): Workflow<PropsT, OutputT, RenderingT> =
   object : StatelessWorkflow<PropsT, OutputT, RenderingT>() {
@@ -94,7 +94,7 @@ inline fun <PropsT, OutputT : Any, RenderingT> Workflow.Companion.stateless(
  * Returns a workflow that does nothing but echo the given [rendering].
  * Handy for testing.
  */
-fun <OutputT : Any, RenderingT> Workflow.Companion.rendering(
+fun <OutputT, RenderingT> Workflow.Companion.rendering(
   rendering: RenderingT
 ): Workflow<Unit, OutputT, RenderingT> = stateless { rendering }
 
@@ -103,7 +103,7 @@ fun <OutputT : Any, RenderingT> Workflow.Companion.rendering(
  * renders [FromRenderingT] to one renders [ToRenderingT],
  */
 /* ktlint-disable parameter-list-wrapping */
-fun <PropsT, OutputT : Any, FromRenderingT, ToRenderingT>
+fun <PropsT, OutputT, FromRenderingT, ToRenderingT>
     Workflow<PropsT, OutputT, FromRenderingT>.mapRendering(
   transform: (FromRenderingT) -> ToRenderingT
 ): Workflow<PropsT, OutputT, ToRenderingT> = Workflow.stateless { props ->
@@ -121,7 +121,7 @@ fun <PropsT, OutputT : Any, FromRenderingT, ToRenderingT>
  * @param name A string describing the update for debugging, included in [toString].
  * @param update Function that defines the workflow update.
  */
-fun <PropsT, OutputT : Any, RenderingT>
+fun <PropsT, OutputT, RenderingT>
     StatelessWorkflow<PropsT, OutputT, RenderingT>.action(
   name: String = "",
   update: Updater<Nothing, OutputT>.() -> Unit
@@ -136,7 +136,7 @@ fun <PropsT, OutputT : Any, RenderingT>
  * [toString].
  * @param update Function that defines the workflow update.
  */
-fun <PropsT, OutputT : Any, RenderingT>
+fun <PropsT, OutputT, RenderingT>
     StatelessWorkflow<PropsT, OutputT, RenderingT>.action(
   name: () -> String,
   update: Updater<Nothing, OutputT>.() -> Unit

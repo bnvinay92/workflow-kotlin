@@ -91,7 +91,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * change (no workflows are added or removed), and children are re-rendered in the same order as
  * before, so the first active child will usually match.
  */
-internal class SubtreeManager<StateT, OutputT : Any>(
+internal class SubtreeManager<StateT, OutputT>(
   private val contextForChildren: CoroutineContext,
   private val emitActionToParent: (WorkflowAction<StateT, OutputT>) -> Any?,
   private val parentDiagnosticId: Long,
@@ -125,7 +125,7 @@ internal class SubtreeManager<StateT, OutputT : Any>(
   }
 
   /* ktlint-disable parameter-list-wrapping */
-  override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> render(
+  override fun <ChildPropsT, ChildOutputT, ChildRenderingT> render(
     child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
     props: ChildPropsT,
     key: String,
@@ -153,7 +153,7 @@ internal class SubtreeManager<StateT, OutputT : Any>(
    * Uses [selector] to invoke [WorkflowNode.tick] for every running child workflow this instance
    * is managing.
    */
-  fun <T : Any> tickChildren(selector: SelectBuilder<T?>) {
+  fun <T> tickChildren(selector: SelectBuilder<T>) {
     children.forEachActive { child ->
       child.workflowNode.tick(selector)
     }
@@ -176,7 +176,7 @@ internal class SubtreeManager<StateT, OutputT : Any>(
     snapshotCache.putAll(childSnapshots.toMap())
   }
 
-  private fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> createChildNode(
+  private fun <ChildPropsT, ChildOutputT, ChildRenderingT> createChildNode(
     child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
     initialProps: ChildPropsT,
     key: String,

@@ -210,7 +210,7 @@ fun <PropsT, OutputT : Any, RenderingT, RunnerT> launchWorkflowIn(
  * rendering.
  */
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalWorkflow::class)
-fun <PropsT, OutputT : Any, RenderingT> renderWorkflowIn(
+fun <PropsT, OutputT, RenderingT> renderWorkflowIn(
   workflow: Workflow<PropsT, OutputT, RenderingT>,
   scope: CoroutineScope,
   props: StateFlow<PropsT>,

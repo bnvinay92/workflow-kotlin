@@ -30,14 +30,14 @@ import kotlinx.coroutines.channels.SendChannel
  *
  * Not for general application use.
  */
-class RealRenderContext<StateT, OutputT : Any>(
+class RealRenderContext<StateT, OutputT>(
   private val renderer: Renderer<StateT, OutputT>,
   private val workerRunner: WorkerRunner<StateT, OutputT>,
   private val eventActionsChannel: SendChannel<WorkflowAction<StateT, OutputT>>
 ) : RenderContext<StateT, OutputT>, Sink<WorkflowAction<StateT, OutputT>> {
 
-  interface Renderer<StateT, OutputT : Any> {
-    fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> render(
+  interface Renderer<StateT, OutputT> {
+    fun <ChildPropsT, ChildOutputT, ChildRenderingT> render(
       child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
       props: ChildPropsT,
       key: String,
@@ -45,7 +45,7 @@ class RealRenderContext<StateT, OutputT : Any>(
     ): ChildRenderingT
   }
 
-  interface WorkerRunner<StateT, OutputT : Any> {
+  interface WorkerRunner<StateT, OutputT> {
     fun <T> runningWorker(
       worker: Worker<T>,
       key: String,
@@ -85,7 +85,7 @@ class RealRenderContext<StateT, OutputT : Any>(
     eventActionsChannel.offer(value)
   }
 
-  override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> renderChild(
+  override fun <ChildPropsT, ChildOutputT, ChildRenderingT> renderChild(
     child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
     props: ChildPropsT,
     key: String,

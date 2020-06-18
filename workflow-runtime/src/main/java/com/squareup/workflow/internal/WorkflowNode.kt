@@ -15,9 +15,9 @@
  */
 package com.squareup.workflow.internal
 
+import com.squareup.workflow.ExperimentalWorkflow
 import com.squareup.workflow.Snapshot
 import com.squareup.workflow.StatefulWorkflow
-import com.squareup.workflow.ExperimentalWorkflow
 import com.squareup.workflow.Worker
 import com.squareup.workflow.Workflow
 import com.squareup.workflow.WorkflowAction
@@ -25,6 +25,7 @@ import com.squareup.workflow.applyTo
 import com.squareup.workflow.diagnostic.IdCounter
 import com.squareup.workflow.diagnostic.WorkflowDiagnosticListener
 import com.squareup.workflow.diagnostic.createId
+import com.squareup.workflow.internal.NoOutput.letUnlessNoOutput
 import com.squareup.workflow.internal.RealRenderContext.WorkerRunner
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineName
@@ -42,7 +43,8 @@ import kotlin.coroutines.EmptyCoroutineContext
  * A node in a state machine tree. Manages the actual state for a given [Workflow].
  *
  * @param emitOutputToParent A function that this node will call when it needs to emit an output
- * value to its parent. Returns either the output to be emitted from the root workflow, or null.
+ * value to its parent. Returns either the output to be emitted from the root workflow, or
+ * [NoOutput].
  * @param initialState Allows unit tests to start the node from a given state, instead of calling
  * [StatefulWorkflow.initialState].
  * @param workerContext [CoroutineContext] that is appended to the end of the context used to launch
@@ -51,7 +53,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * structured concurrency).
  */
 @OptIn(ExperimentalWorkflow::class)
-internal class WorkflowNode<PropsT, StateT, OutputT : Any, RenderingT>(
+internal class WorkflowNode<PropsT, StateT, OutputT, RenderingT>(
   val id: WorkflowId<PropsT, OutputT, RenderingT>,
   workflow: StatefulWorkflow<PropsT, StateT, OutputT, RenderingT>,
   initialProps: PropsT,
@@ -168,7 +170,7 @@ internal class WorkflowNode<PropsT, StateT, OutputT : Any, RenderingT>(
    *
    * It is an error to call this method after calling [cancel].
    */
-  fun <T : Any> tick(selector: SelectBuilder<T?>) {
+  fun <T> tick(selector: SelectBuilder<T>) {
     // Listen for any child workflow updates.
     subtreeManager.tickChildren(selector)
 
@@ -183,7 +185,7 @@ internal class WorkflowNode<PropsT, StateT, OutputT : Any, RenderingT>(
             // Set the tombstone flag so we don't continue to listen to the subscription.
             child.tombstone = true
             // Nothing to do on close other than update the session, so don't emit any output.
-            return@onReceive null
+            return@onReceive noOutput()
           } else {
             val update = child.acceptUpdate(valueOrDone.value)
             @Suppress("UNCHECKED_CAST")
@@ -259,12 +261,13 @@ internal class WorkflowNode<PropsT, StateT, OutputT : Any, RenderingT>(
    * Applies [action] to this workflow's [state] and
    * [emits an output to its parent][emitOutputToParent] if necessary.
    */
-  private fun <T : Any> applyAction(action: WorkflowAction<StateT, OutputT>): T? {
-    val (newState, output) = action.applyTo(state)
+  private fun <T> applyAction(action: WorkflowAction<StateT, OutputT>): T {
+    val (newState, output) = action.applyTo(state, NoOutput)
     diagnosticListener?.onWorkflowAction(diagnosticId, action, state, newState, output)
     state = newState
+
     @Suppress("UNCHECKED_CAST")
-    return output?.let(emitOutputToParent) as T?
+    return output.letUnlessNoOutput { emitOutputToParent(it as OutputT) } as T
   }
 
   private fun <T> createWorkerNode(

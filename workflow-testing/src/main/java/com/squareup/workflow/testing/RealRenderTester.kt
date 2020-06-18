@@ -27,7 +27,7 @@ import com.squareup.workflow.testing.RealRenderTester.Expectation.ExpectedWorker
 import com.squareup.workflow.testing.RealRenderTester.Expectation.ExpectedWorkflow
 import kotlin.reflect.KClass
 
-internal class RealRenderTester<PropsT, StateT, OutputT : Any, RenderingT>(
+internal class RealRenderTester<PropsT, StateT, OutputT, RenderingT>(
   private val workflow: StatefulWorkflow<PropsT, StateT, OutputT, RenderingT>,
   private val props: PropsT,
   private val state: StateT,
@@ -43,7 +43,7 @@ internal class RealRenderTester<PropsT, StateT, OutputT : Any, RenderingT>(
   internal sealed class Expectation<out OutputT> {
     abstract val output: EmittedOutput<OutputT>?
 
-    data class ExpectedWorkflow<OutputT : Any, RenderingT>(
+    data class ExpectedWorkflow<OutputT, RenderingT>(
       val workflowType: KClass<out Workflow<*, OutputT, RenderingT>>,
       val key: String,
       val assertProps: (props: Any?) -> Unit,
@@ -60,7 +60,7 @@ internal class RealRenderTester<PropsT, StateT, OutputT : Any, RenderingT>(
 
   override val actionSink: Sink<WorkflowAction<StateT, OutputT>> get() = this
 
-  override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> expectWorkflow(
+  override fun <ChildPropsT, ChildOutputT, ChildRenderingT> expectWorkflow(
     workflowType: KClass<out Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>>,
     rendering: ChildRenderingT,
     key: String,
@@ -111,7 +111,7 @@ internal class RealRenderTester<PropsT, StateT, OutputT : Any, RenderingT>(
     return this
   }
 
-  override fun <ChildPropsT, ChildOutputT : Any, ChildRenderingT> renderChild(
+  override fun <ChildPropsT, ChildOutputT, ChildRenderingT> renderChild(
     child: Workflow<ChildPropsT, ChildOutputT, ChildRenderingT>,
     props: ChildPropsT,
     key: String,
